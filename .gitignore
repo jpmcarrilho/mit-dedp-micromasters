@@ -1,0 +1,18 @@
+# History files
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+
+# Ignore data files to prevent uploading large datasets to GitHub
+*.csv
+*.dta
+*.xlsx
+*.rds
+*.rda
+
+# Exclude Mac system files
+.DS_Store
+
+# RStudio project files
+.Rproj.user
