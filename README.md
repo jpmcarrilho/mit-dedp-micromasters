@@ -44,6 +44,13 @@ Analyses surrounding institutions, corruption, and the political drivers of econ
 - **Week 9**: Corruption, Monitoring, and Audits in Infrastructure Projects
   - Script: `09-corruption-monitoring-indonesia.R`
 
+### 3. Foundations of Development Policy
+Microeconomic and macroeconomic considerations of policy interventions, including indicators of global health, wealth inequality, and educational access.
+
+**Course Weeks & Topics:**
+- **Week 1**: Global Development Indicators, Wealth, and Human Welfare
+  - Script: `01-development-indicators.R`
+
 ## Technologies Used
 - **R**
 - **tidyverse** (dplyr, ggplot2, readr)
