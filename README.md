@@ -50,6 +50,8 @@ Microeconomic and macroeconomic considerations of policy interventions, includin
 **Course Weeks & Topics:**
 - **Week 1**: Global Development Indicators, Wealth, and Human Welfare
   - Script: `01-development-indicators.R`
+- **Week 2**: Health, Nutrition, and Deworming in Schools
+  - Script: `02-nutrition.R`
 
 ## Technologies Used
 - **R**
