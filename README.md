@@ -52,6 +52,8 @@ Microeconomic and macroeconomic considerations of policy interventions, includin
   - Script: `01-development-indicators.R`
 - **Week 2**: Health, Nutrition, and Deworming in Schools
   - Script: `02-nutrition.R`
+- **Week 3**: Education, School Construction, and Returns to Schooling
+  - Script: `03-education.R`
 
 ## Technologies Used
 - **R**
