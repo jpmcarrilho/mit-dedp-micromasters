@@ -1,11 +1,15 @@
-# MIT DEDP Micromasters
+# MIT DEDP MicroMasters: Empirical Economics & Causal Inference
 
-This repository contains my R code and assignments from the MIT Data, Economics, and Development Policy (DEDP) Micromasters program.
+A comprehensive repository of empirical econometrics, causal inference methodologies, and development policy evaluations developed across the **MIT Data, Economics, and Development Policy (DEDP) MicroMasters** program. 
 
-## Courses
+This repository documents rigorous R implementations replicating seminal papers in development economics, public policy, and political economy—leveraging randomized controlled trials (RCTs), difference-in-differences (DiD), instrumental variables (2SLS), regression discontinuity designs (RDD), and high-dimensional two-way fixed effects (TWFE).
+
+---
+
+## Courses & Curriculum
 
 ### 1. Data Analysis for Social Scientists
-Code, exploratory data analysis, and regression modeling performed throughout the course modules. Topics range from basic statistics to randomized controlled trials and causal inference techniques.
+Exploratory data analysis, probability theory, causal inference, and regression modeling applied to empirical social science questions.
 
 **Course Modules & Topics:**
 - **Module 1**: Introduction to the Course
@@ -27,36 +31,41 @@ Code, exploratory data analysis, and regression modeling performed throughout th
 - **Module 11**: Endogeneity and Instrumental Variables
   - Script: `11-endogeneity-and-instrumental-variables.R`
 
-### 2. Political Economy and Economic Development
-Analyses surrounding institutions, corruption, and the political drivers of economic outcomes in developing nations.
-
-**Course Weeks & Topics:**
-- **Week 1**: Introduction to R & Economic Development Simulation
-  - Script: `01-political-economy-simulation.R`
-- **Week 2**: Leaders, Assassinations, and Institutional Change
-  - Script: `02-assassinations-and-institutions.R`
-- **Week 3**: Colonial Origins of Comparative Development
-  - Script: `03-colonial-origins-institutions.R`
-- **Week 4**: Historical Legacy of the Mita and Regression Discontinuity
-  - Script: `04-mita-regression-discontinuity.R`
-- **Week 7**: Campaign Donations and County-Level Fixed Effects
-  - Script: `07-campaign-donations-fixed-effects.R`
-- **Week 9**: Corruption, Monitoring, and Audits in Infrastructure Projects
-  - Script: `09-corruption-monitoring-indonesia.R`
-
-### 3. Foundations of Development Policy
-Microeconomic and macroeconomic considerations of policy interventions, including indicators of global health, wealth inequality, and educational access.
+### 2. Foundations of Development Policy
+Microeconomic and macroeconomic considerations of policy interventions, evaluating global health, educational investments, gender inequality, and intrahousehold bargaining.
 
 **Course Weeks & Topics:**
 - **Week 1**: Global Development Indicators, Wealth, and Human Welfare
   - Script: `01-development-indicators.R`
-- **Week 2**: Health, Nutrition, and Deworming in Schools
+- **Week 2**: Health, Nutrition, and Deworming in Schools (Miguel & Kremer 2004)
   - Script: `02-nutrition.R`
-- **Week 3**: Education, School Construction, and Returns to Schooling
+- **Week 3**: Education, School Construction, and Returns to Schooling (Duflo 2001)
   - Script: `03-education.R`
+- **Week 4**: Gender, Intrahousehold Allocation, and Comparative Advantage (Qian 2008)
+  - Script: `04-gender.R`
 
-## Technologies Used
-- **R**
-- **tidyverse** (dplyr, ggplot2, readr)
-- **fixest** (for high-dimensional fixed effects models)
-- **R Markdown**
+### 3. Political Economy and Economic Development
+Empirical analyses investigating governance, institutions, state capacity, corruption, and the political drivers of economic development.
+
+**Course Weeks & Topics:**
+- **Week 1**: Introduction to R & Economic Development Simulation
+  - Script: `01-political-economy-simulation.R`
+- **Week 2**: Leaders, Assassinations, and Institutional Change (Jones & Olken 2009)
+  - Script: `02-assassinations-and-institutions.R`
+- **Week 3**: Colonial Origins of Comparative Development (Acemoglu, Johnson & Robinson 2001)
+  - Script: `03-colonial-origins-institutions.R`
+- **Week 4**: Historical Legacy of the Mita and Regression Discontinuity (Dell 2010)
+  - Script: `04-mita-regression-discontinuity.R`
+- **Week 7**: Campaign Donations and County-Level Fixed Effects
+  - Script: `07-campaign-donations-fixed-effects.R`
+- **Week 9**: Corruption, Monitoring, and Audits in Infrastructure Projects (Olken 2007)
+  - Script: `09-corruption-monitoring-indonesia.R`
+
+---
+
+## Econometric Toolset & Technologies
+- **Language**: R
+- **Data Wrangling & Visualization**: `tidyverse` (`dplyr`, `ggplot2`, `readr`, `tibble`, `tidyr`)
+- **Panel & Fixed Effects Econometrics**: `lfe` (`felm`), `fixest`
+- **Instrumental Variables & 2SLS**: `AER` (`ivreg`), `sandwich`, `lmtest`
+- **Reporting**: R Markdown
