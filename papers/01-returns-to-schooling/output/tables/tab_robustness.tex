@@ -1,0 +1,24 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Robustness of the pooled linear estimate},
+note{}={Coefficient on years of schooling in the linear specification with state and year fixed effects, pooled 2012-2025. Rows (1)-(6) use design-based inference (PNAD Contínua strata, PSUs and first-visit weights); (7) ignores weights and design and uses HC1 standard errors; (8) uses the weights with standard errors clustered by UPA but ignores strata. (2) uses effective instead of habitual earnings; (3) keeps signed-card or statutory employees and contributing self-employed; (4) keeps wage employees; (5) widens the age range; (6) drops the 0.5\% tails of log earnings.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]},
+hline{2}={1-5}{solid, black, 0.05em},
+hline{1}={1-5}{solid, black, 0.08em},
+hline{10}={1-5}{solid, black, 0.08em},
+column{1-5}={}{halign=l},
+}                     %% tabularray inner close
+Variant & Years of schooling & SE & 95\% CI & Observations \\
+(1) Baseline & 0.0976 & (0.0005) & [0.0967, 0.0986] & 1,773,567 \\
+(2) Effective earnings & 0.1002 & (0.0005) & [0.0992, 0.1012] & 1,728,784 \\
+(3) Formal only & 0.1019 & (0.0006) & [0.1007, 0.1030] & 1,044,622 \\
+(4) Wage employees & 0.0989 & (0.0005) & [0.0979, 0.0999] & 1,174,059 \\
+(5) Ages 18-64 & 0.0954 & (0.0005) & [0.0945, 0.0963] & 2,056,891 \\
+(6) Trimmed 0.5/99.5 & 0.0924 & (0.0004) & [0.0916, 0.0933] & 1,755,831 \\
+(7) Unweighted OLS, HC1 & 0.0936 & (0.0001) & [0.0933, 0.0939] & 1,773,567 \\
+(8) Weighted OLS, cluster UPA & 0.0976 & (0.0005) & [0.0966, 0.0987] & 1,773,567 \\
+\end{talltblr}
+\end{table}

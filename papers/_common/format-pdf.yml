@@ -1,0 +1,23 @@
+# Shared PDF format for every paper in the series. Referenced from each
+# paper.qmd through `metadata-files`. PDF engine is tectonic (installed via
+# Homebrew), which fetches LaTeX packages on demand, so no TinyTeX is needed.
+format:
+  pdf:
+    documentclass: article
+    papersize: a4
+    fontsize: 11pt
+    geometry:
+      - margin=2.5cm
+    number-sections: true
+    colorlinks: true
+    link-citations: true
+    pdf-engine: tectonic
+    keep-tex: false
+    fig-pos: "H"
+    include-in-header:
+      text: |
+        \usepackage{booktabs}
+        \usepackage{longtable}
+        \usepackage{float}
+        \usepackage{setspace}
+        \onehalfspacing

@@ -1,0 +1,50 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Mincer regressions, pooled 2012-2025},
+note{}={Design-based standard errors in parentheses, computed from the PNAD Contínua strata, primary sampling units and first-visit weights (V1032). Dependent variable: log real hourly earnings in the main job (habitual monthly earnings at 2025 prices divided by 52/12 times weekly hours). Sample: occupied persons aged 25-64 with positive earnings and 1-120 weekly hours. + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001. Education levels are relative to no schooling; interactions are relative to men and to White/Asian workers.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+hline{2}={1-4}{solid, black, 0.05em},
+hline{1}={1-4}{solid, black, 0.08em},
+hline{36}={1-4}{solid, black, 0.08em},
+column{1-4}={}{halign=l},
+}                     %% tabularray inner close
+& (1) Linear & (2) Levels & (3) Interactions \\
+Years of schooling & 0.0976*** &  & 0.1080*** \\
+& (0.0005) &  & (0.0008) \\
+Fundamental incomplete &  & 0.2455*** &  \\
+&  & (0.0050) &  \\
+Fundamental complete &  & 0.4248*** &  \\
+&  & (0.0055) &  \\
+Médio incomplete &  & 0.4794*** &  \\
+&  & (0.0058) &  \\
+Médio complete &  & 0.6340*** &  \\
+&  & (0.0054) &  \\
+Superior incomplete &  & 0.9275*** &  \\
+&  & (0.0068) &  \\
+Superior complete &  & 1.4470*** &  \\
+&  & (0.0072) &  \\
+Schooling × Women &  &  & 0.0092*** \\
+&  &  & (0.0004) \\
+Schooling × Black/Brown &  &  & -0.0251*** \\
+&  &  & (0.0007) \\
+Schooling × Indigenous &  &  & -0.0292*** \\
+&  &  & (0.0039) \\
+Women & -0.2510*** & -0.2639*** & -0.3518*** \\
+& (0.0016) & (0.0015) & (0.0042) \\
+Black/Brown & -0.1532*** & -0.1177*** & 0.1208*** \\
+& (0.0025) & (0.0021) & (0.0062) \\
+Indigenous & -0.1643*** & -0.1384*** & 0.1511*** \\
+& (0.0151) & (0.0150) & (0.0386) \\
+Age & 0.0463*** & 0.0414*** & 0.0461*** \\
+& (0.0007) & (0.0007) & (0.0007) \\
+Age squared & -0.0004*** & -0.0004*** & -0.0004*** \\
+& (0.0000) & (0.0000) & (0.0000) \\
+Urban & 0.2020*** & 0.2592*** & 0.2106*** \\
+& (0.0036) & (0.0037) & (0.0036) \\
+Observations & 1,773,567 & 1,773,567 & 1,773,567 \\
+State and year fixed effects & Yes & Yes & Yes \\
+\end{talltblr}
+\end{table}

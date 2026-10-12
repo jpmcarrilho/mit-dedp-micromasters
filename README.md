@@ -66,6 +66,15 @@ Empirical analyses investigating governance, institutions, state capacity, corru
 ## Econometric Toolset & Technologies
 - **Language**: R
 - **Data Wrangling & Visualization**: `tidyverse` (`dplyr`, `ggplot2`, `readr`, `tibble`, `tidyr`)
-- **Panel & Fixed Effects Econometrics**: `lfe` (`felm`), `fixest`
+- **Panel & Fixed Effects Econometrics**: `lfe` (`felm`)
 - **Instrumental Variables & 2SLS**: `AER` (`ivreg`), `sandwich`, `lmtest`
-- **Reporting**: R Markdown
+- **Survey Inference** (papers/): `survey`, `srvyr`, `PNADcIBGE`
+- **Reporting**: Quarto (papers/)
+
+---
+
+## Brazilian Replication Papers (`papers/`)
+
+Short, reproducible working papers that re-run the course methods on Brazilian public microdata, with design-based inference and a replication package per paper. See [`papers/README.md`](papers/README.md) for the series, [`papers/CHECKLIST.md`](papers/CHECKLIST.md) for the validity standard, and [`papers/PUBLISHING.md`](papers/PUBLISHING.md) for the release path.
+
+- **Paper 01**: Returns to Schooling in Brazil, 2012–2025: Design-Based Mincer Estimates from the PNAD Contínua (`papers/01-returns-to-schooling/`)
