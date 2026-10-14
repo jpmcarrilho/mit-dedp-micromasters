@@ -31,6 +31,7 @@ Raw microdata are downloaded to each paper's `data/` folder (git-ignored) on fir
 - `NN-slug/` one folder per paper: `R/` pipeline, `tests/`, `paper.qmd`, `output/`
 - `CHECKLIST.md` validity checklist ticked before any release
 - `PUBLISHING.md` release steps (Zenodo DOI, SSRN, MPRA, arXiv, ANPEC/SBE)
+- `PLAYBOOK.md` how a paper is made: the Paper 01 record, the step-by-step procedure, and the pitfalls to avoid
 
 ## Citing
 
