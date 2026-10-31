@@ -1,0 +1,59 @@
+---
+title: "Paper title"
+subtitle: "Brazilian Replications in Development Economics, Paper NN"
+author:
+  - name: João Pedro Megid Carrilho
+    affiliations:
+      - name: Independent researcher
+date: today
+date-format: "D MMMM YYYY"
+abstract: |
+  English abstract (150 words). State the question, the data, the method, the main numbers, and whether the evidence is descriptive or causal.
+
+  **Resumo.** Resumo em português (150 palavras), com a mesma informação.
+
+  **JEL:** I26, J31. **Keywords:** returns to schooling; Brazil; PNAD Contínua; survey design.
+metadata-files:
+  - ../_common/format-pdf.yml
+bibliography: ../references.bib
+csl: ../_common/chicago-author-date.csl
+---
+
+# Introduction
+
+Question, why Brazil, what is new, one-paragraph preview of results, and an explicit sentence on whether the evidence is descriptive or causal.
+
+# Relation to the original paper
+
+What the course paper [@duflo2001] did, what is replicated here, what differs, and why the differences matter.
+
+# Data
+
+Source, years, sampling design, variables, sample construction (counts at each filter step in the appendix), deflators.
+
+# Method
+
+Specification, identification (or the absence of it), and inference: design-based standard errors with weights, strata and PSUs.
+
+# Results
+
+Main table and figure; magnitudes in economic terms.
+
+# Robustness
+
+Pre-listed checks, including the ones that did not help the story.
+
+# Limitations
+
+Written against the strongest objection.
+
+# Conclusion
+
+# References {.unnumbered}
+
+::: {#refs}
+:::
+
+# Appendix {.unnumbered}
+
+Sample construction counts; official-aggregate checks; additional tables.

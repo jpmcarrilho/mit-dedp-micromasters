@@ -9,3 +9,13 @@
 
 # RStudio project files
 .Rproj.user
+
+# papers/ pipeline artefacts (raw and cleaned microdata are downloaded by script)
+papers/**/data/
+papers/**/*_cache/
+papers/**/*_files/
+papers/**/.quarto/
+papers/**/*.log
+papers/renv/library/
+papers/renv/staging/
+papers/renv/local/

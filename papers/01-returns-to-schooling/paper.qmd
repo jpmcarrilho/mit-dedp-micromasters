@@ -1,0 +1,201 @@
+---
+title: "Returns to Schooling in Brazil, 2012–2025: Design-Based Mincer Estimates from the PNAD Contínua"
+subtitle: "Brazilian Replications in Development Economics, Paper 01"
+author:
+  - name: João Pedro Megid Carrilho
+    affiliations:
+      - name: Independent researcher
+date: today
+date-format: "D MMMM YYYY"
+abstract: |
+  Brazil added almost two years of schooling to its workforce between 2012 and 2025. This paper asks what a year of schooling is worth in the labour market over that period, and for whom. Using the first-visit microdata of the PNAD Contínua for 2012–2019 and 2022–2025, 1.77 million workers aged 25–64, I estimate Mincer earnings equations with standard errors that respect the survey's strata, clusters and weights, after first reproducing IBGE's own published aggregates from the microdata. The return to a year of schooling is 9.8 percent and varies little across years, between 9.3 and 10.2 percent. That stable average hides a convex profile and a steady compression of the premia attached to each completed level: the premium of a university degree over no schooling fell from 1.62 to 1.29 log points. Returns are higher for women, lower for Black and Brown workers and highest in the Nordeste. Unweighted OLS with robust standard errors understates uncertainty threefold. The estimates are the descriptive benchmark that Duflo (2001) compares with her instrumental-variables results; they are not causal effects.
+
+  **Resumo.** O Brasil acrescentou quase dois anos de estudo à sua força de trabalho entre 2012 e 2025. Este artigo pergunta quanto vale um ano de estudo no mercado de trabalho nesse período, e para quem. Com os microdados da primeira visita da PNAD Contínua de 2012–2019 e 2022–2025, 1,77 milhão de trabalhadores de 25 a 64 anos, estimo equações de Mincer com erros-padrão que respeitam os estratos, os conglomerados e os pesos da pesquisa, depois de reproduzir os agregados oficiais do IBGE a partir dos microdados. O retorno a um ano de estudo é de 9,8% e varia pouco entre os anos, de 9,3% a 10,2%. Essa média estável esconde um perfil convexo e uma compressão contínua dos prêmios de cada nível concluído: o prêmio do ensino superior sobre a ausência de instrução caiu de 1,62 para 1,29 pontos de log. Os retornos são maiores para mulheres, menores para pretos e pardos e mais altos no Nordeste. MQO sem pesos e com erros-padrão robustos subestima a incerteza em três vezes. As estimativas são o padrão descritivo com que Duflo (2001) compara seus resultados por variáveis instrumentais; não são efeitos causais.
+
+  **JEL:** I26, J31, O15, O54. **Keywords:** returns to schooling; Mincer equation; Brazil; PNAD Contínua; complex survey design; replication.
+metadata-files:
+  - ../_common/format-pdf.yml
+bibliography: ../references.bib
+csl: ../_common/chicago-author-date.csl
+---
+
+```{r setup}
+#| include: false
+suppressPackageStartupMessages({ library(dplyr); library(knitr) })
+tab_dir <- "output/tables"; fig_dir <- "output/figures"
+H        <- readRDS(file.path(tab_dir, "headline.rds"))
+by_year  <- read.csv(file.path(tab_dir, "estimates_by_year.csv"))
+desc     <- read.csv(file.path(tab_dir, "descriptives_by_year.csv"))
+lev      <- read.csv(file.path(tab_dir, "levels_by_year.csv"))
+het      <- read.csv(file.path(tab_dir, "heterogeneity_by_year.csv"))
+hetp     <- read.csv(file.path(tab_dir, "heterogeneity_pooled.csv"))
+regp     <- read.csv(file.path(tab_dir, "regions_pooled.csv"))
+pc       <- read.csv(file.path(tab_dir, "pooled_coefficients.csv"))
+rob      <- read.csv(file.path(tab_dir, "robustness_schooling.csv"))
+checks   <- read.csv(file.path(tab_dir, "official_checks.csv"))
+counts   <- read.csv("data/clean/build_counts.csv")
+pct  <- function(x, d = 1) sprintf(paste0("%.", d, "f%%"), 100 * x)
+num  <- function(x, d = 3) formatC(x, digits = d, format = "f")
+big  <- function(x) format(x, big.mark = ",")
+ci   <- function(r, d = 1) sprintf("[%s, %s]", pct(r$conf.low, d), pct(r$conf.high, d))
+yr   <- function(y) by_year[by_year$year == y, ]
+cf   <- function(model, term) pc$estimate[pc$model == model & pc$term == term]
+se   <- function(model, term) pc$std.error[pc$model == model & pc$term == term]
+lv   <- function(level, y = NULL) if (is.null(y)) cf("levels", paste0("edu_level", level)) else lev$estimate[lev$year == y & lev$term == paste0("edu_level", level)]
+hp   <- function(g) hetp[hetp$group == g, ]
+rg   <- function(r) regp[regp$region == r, ]
+rb   <- function(i) rob[i, ]
+first_year <- min(by_year$year); last_year <- max(by_year$year)
+n_years <- nrow(by_year)
+pool <- H$pooled_linear
+d_first <- desc[desc$year == first_year, ]; d_last <- desc[desc$year == last_year, ]
+ret_fund <- lv("Fundamental complete") / 9
+ret_medio <- (lv("Medio complete") - lv("Fundamental complete")) / 3
+ret_sup <- (lv("Superior complete") - lv("Medio complete")) / 4
+sheep_fund <- lv("Fundamental complete") - lv("Fundamental incomplete")
+sheep_medio <- lv("Medio complete") - lv("Medio incomplete")
+sheep_sup <- lv("Superior complete") - lv("Superior incomplete")
+gap_race <- function(S) cf("interactions", "raceBlack/Brown") + S * cf("interactions", "schooling:raceBlack/Brown")
+gap_women <- function(S) cf("interactions", "female_fWomen") + S * cf("interactions", "schooling:female_fWomen")
+```
+
+# Introduction
+
+Few numbers in economics are asked for as often as the return to schooling: the extra earnings that one more year in school buys. @mincer1974 gave the question its standard form, a regression of log earnings on years of schooling and experience, and the coefficient on schooling has since been estimated for most countries in the world. Returns are typically higher in poorer countries and in Latin America than in rich ones, and they tend to fall as schooling spreads [@psacharopoulos1994; @psacharopoulos2018]. Brazil is a case in point. In the 1990s its return was among the highest measured anywhere, and the Brazilian literature has documented both its decline and its unusual shape, with much of the pay-off concentrated at the top of the schooling distribution [@lam1993; @menezesfilho2001; @barbosafilho2008; @menezesfilho2006; @ferreira2022]. Since then the country has kept adding schooling at a fast pace. Among occupied workers aged 25–64, mean schooling rose from `r num(d_first$schooling, 1)` years in `r first_year` to `r num(d_last$schooling, 1)` years in `r last_year`. What happened to the return while the supply of educated workers grew that quickly is the question of this paper.
+
+The method is deliberately plain. I estimate the Mincer equation on the annual first-visit microdata of the PNAD Contínua, the continuous household survey of the Brazilian statistical office (IBGE), for every year released between `r first_year` and `r last_year`, which excludes 2020 and 2021. Two features distinguish the exercise from a textbook regression. First, the standard errors respect how the survey was drawn. The PNAD Contínua does not sample people at random across the country: it first selects census tracts, then households inside them, and it weights the result to match the population. People in the same tract are more alike than people chosen at random, so a sample of 150,000 workers carries less information than its size suggests, and standard errors that ignore this are too small [@lumley2004]. Second, before any regression is run, the code reproduces IBGE's own published figures for mean labour income and mean schooling from the same microdata. If the weights, the deflators or the sample definitions were wrong, that check would fail. It passes to within 0.01 percent of the published labour-income series in eleven of twelve years.
+
+The exercise belongs to a series that re-runs the empirical methods of the MIT MicroMasters course *Foundations of Development Policy* on Brazilian data. The Week 3 paper of that course is @duflo2001, which uses a school-construction program in Indonesia to estimate a causal return to schooling and compares it with the ordinary least-squares (OLS) return of 7.8 percent in the same data. The comparison is the point: OLS measures how much more educated people earn, not how much more a given person would earn with another year of school, because the two differ in ability, family background and the schools they attended [@griliches1977; @card1999]. This paper does the OLS half of that comparison for Brazil, with the care that the survey deserves, and leaves the causal half, which needs a natural experiment, to a later paper in the series.
+
+The results are easy to summarise. Pooled over twelve survey years, a year of schooling is associated with `r pct(pool$estimate)` higher hourly earnings, and the year-by-year estimates move only between `r pct(min(by_year$estimate))` and `r pct(max(by_year$estimate))`, with the lowest values after the pandemic. That stability is misleading on its own. The relation between schooling and earnings is strongly convex, with an implied `r pct(ret_sup, 0)` per year of university against `r pct(ret_fund, 0)` per year of primary school, and every level premium fell over the period: relative to workers with no schooling, a completed degree was worth `r num(lv("Superior complete", first_year), 2)` log points in `r first_year` and `r num(lv("Superior complete", last_year), 2)` in `r last_year`. A single Mincer coefficient can stay flat while all premia fall if the workforce moves up a convex profile, which is what happened. The gradient is steeper for women than for men, flatter for Black and Brown workers than for White and Asian workers, so that the gender gap narrows with schooling while the racial gap widens, and it is steepest in the Nordeste. Finally, treating the survey as a random sample and using robust standard errors makes the estimates look `r sprintf("%.1f", rb(1)$std.error / rb(7)$std.error)` times more precise than they are.
+
+Section 2 explains what Duflo's paper and its recent reanalysis teach about doing this well. Sections 3 and 4 describe the data and the method. Sections 5 and 6 present the results and their robustness, Section 7 what the numbers cannot tell us, and Section 8 concludes.
+
+# What Duflo (2001) and its reanalysis teach
+
+Between 1973 and 1978 Indonesia built more than 61,000 primary schools, about two for every thousand children, and the number of schools each district received was set by a rule: proportional to the number of children not in school in 1972. @duflo2001 noticed that this created two sources of variation that an adult cannot manipulate. Children who were twelve or older in 1974 had already finished primary school and could not benefit; younger children could, and more so where more schools were built. Comparing the schooling and the 1995 wages of young and old cohorts across districts with more and fewer schools, she finds that each school per thousand children raised schooling by 0.12–0.19 years and wages by 1.5–2.7 percent. Dividing the wage effect by the schooling effect gives a causal return to a year of schooling between 6.8 and 10.6 percent, close to the 7.8 percent that a plain Mincer regression gives in the same sample. Her reading was that in Indonesia the OLS return was not inflated by family background, and that it was lower than in earlier decades because schooling had become much more common, a supply effect of the kind described by @katz1992.
+
+The paper has been revisited. @roodman2022 rebuilt the data from primary sources, corrected entry errors in about a tenth of the observations, clustered the standard errors by district, the unit at which schools were assigned [@bertrand2004], followed the cohorts into later surveys, and applied modern tests for weak instruments. The headline estimates do not survive all of these changes, and the causal return turns out to be too imprecise to pin down. The patterns that made the original argument, effects appearing only in the exposed cohorts and at the grade levels where schools were built, partly persist. He also found that the original code weighted some estimates and not others, a choice the paper never discussed.
+
+Three habits follow, and this paper adopts them. State every inference choice in the text rather than leaving it to the code; keep the same controls in every table; and report the shape of the relationship, not only one coefficient, because patterns are what survive scrutiny. The convexity of the Brazilian profile and the jumps at completed levels, which @hungerford1987 called sheepskin effects, are the Brazilian counterpart of Duflo's cohort fingerprints.
+
+# Data
+
+## The PNAD Contínua
+
+The PNAD Contínua has been in the field since 2012 and interviews about 211,000 households every quarter [@ibgepnadc]. Its sample is drawn in two stages: census tracts are selected within strata that combine state, metropolitan status and other criteria, and households are then selected within each tract. Every household is interviewed five times over five consecutive quarters. IBGE publishes the first of these interviews as an annual file, which contains the full questionnaire on schooling and work, and it is this first-visit file that IBGE uses for its own annual labour-income releases. I use every first-visit file released: `r first_year` to 2019 and 2022 to `r last_year`. During the pandemic fieldwork moved to the telephone and IBGE did not publish first-visit files for 2020 and 2021, so those two years are absent from every figure and table. The files were downloaded on 11 October 2026 with the PNADcIBGE package [@pnadcibge], which also attaches the deflators IBGE publishes for them; earnings are expressed at 2025 average prices throughout.
+
+Three variables describe the design: the stratum, the census tract, which is the primary sampling unit, and the first-visit weight, which IBGE calibrates so that the weighted sample matches population projections by age, sex and area. All three enter the analysis.
+
+## Sample and variables
+
+The dependent variable is the log of real hourly earnings in the main job, computed as habitual monthly earnings divided by habitual weekly hours times 52/12. Schooling is IBGE's standardised count of completed years, from 0 to 16, in which 9 years means a completed *ensino fundamental*, 12 a completed *ensino médio* and 16 a completed university degree; the companion variable records the highest level completed. The controls are age and its square, sex, race in IBGE's categories grouped as White or Asian, Black or Brown, and Indigenous, an urban indicator and state fixed effects; the pooled specifications add year fixed effects.
+
+The analysis sample is every occupied person aged 25 to 64 with positive habitual earnings and between 1 and 120 weekly hours in the main job, with schooling and race reported. Unlike Duflo's Indonesian survey, which recorded wages for employees only, the PNAD Contínua records earnings for the self-employed and for employers, so they are included; a sample of wage employees only is reported as a robustness check. @tbl-counts in the appendix gives the count at each filter step and year. Between `r pct(min(counts$n[counts$step == "Schooling and race reported (analysis sample)"] / counts$n[counts$step == "Occupied"]), 1)` and `r pct(max(counts$n[counts$step == "Schooling and race reported (analysis sample)"] / counts$n[counts$step == "Occupied"]), 1)` of occupied people in the age range make it into the sample; the main loss is unpaid family workers, who have no earnings. The final sample has `r big(H$n_total)` person-years.
+
+@tbl-desc shows what the sample looks like year by year. Mean schooling rose by almost two years; real hourly earnings fell during the 2015–2016 recession and recovered after 2022, ending at R$ `r num(d_last$hourly, 2)` an hour at 2025 prices; the share of women rose from `r pct(d_first$female)` to `r pct(d_last$female)` and the share of Black and Brown workers from `r pct(d_first$black_brown)` to `r pct(d_last$black_brown)`; the share in formal work stayed near `r pct(mean(desc$formal), 0)`.
+
+{{< include output/tables/tab_descriptives.md >}}
+
+## Checking the microdata against IBGE's published figures
+
+Weights, deflators and the exact definition of who counts as "occupied with earnings" are where survey analyses most often go wrong, and the errors are invisible in a regression table. So before any model is estimated, the code recomputes two series that IBGE publishes from these same files and compares them with the published values (@tbl-checks in the appendix). Mean real monthly labour income of occupied persons aged 14 or more, habitually and effectively received, is reproduced from SIDRA table 7445 to within 0.01 percent in every year except 2022, where the current microdata file gives values 3.3 percent above the published ones; the published 2022 figures appear to predate the 2025 revision of the microdata, and the gap is recorded rather than hidden. Mean years of schooling of persons aged 25 or more, in total and by sex, is reproduced from SIDRA table 7126 to within `r pct(max(checks$rel_diff[grepl("schooling", checks$label)]), 1)`; that series comes from a different quarter's supplement and is published rounded to one decimal, so a closer match is not expected. The exercise also pinned down one definitional detail: IBGE's published mean of effective earnings averages over everyone with positive habitual earnings, including months with zero effective earnings.
+
+# Method
+
+## The earnings equation
+
+The baseline is Mincer's equation,
+
+$$
+\ln w_{i} = \beta\, S_{i} + \gamma_1 \text{age}_{i} + \gamma_2 \text{age}^2_{i} + \mathbf{x}_{i}'\boldsymbol{\delta} + \alpha_{s(i)} + \varepsilon_{i},
+$$ {#eq-mincer}
+
+where $w_i$ is the hourly earnings of worker $i$, $S_i$ her years of schooling, $\mathbf{x}_i$ the sex, race and urban indicators and $\alpha_{s(i)}$ a fixed effect for her state. The coefficient $\beta$ is the proportional difference in hourly earnings between two workers who differ by one year of schooling and share the same age, sex, race, area and state. @mincer1974 derived the equation from a model in which schooling is an investment that pays a constant rate of return, which is why the dependent variable is in logs and why $\beta$ is read as a rate; @heckman2006 review what the derivation assumes and how the equation has held up. Mincer used potential experience, age minus schooling minus six, rather than age; I follow @lemieux2006 in preferring an age polynomial, because potential experience is itself a function of schooling and the estimate of $\beta$ then depends on how that function is specified.
+
+The equation is estimated separately for each survey year, which traces the trend in $\beta$, and pooled over all years with year fixed effects. Two variants loosen the assumption of a constant rate. The first replaces years of schooling by indicators for the highest level completed, so that the return can differ along the schooling distribution and can jump at the completion of a level. @hungerford1987 and @jaeger1996 showed for the United States that such jumps exist, which they attributed to the diploma signalling something beyond the years it took; the Brazilian literature finds them large [@barbosafilho2008]. The second interacts years of schooling with sex and with race, so that each sex-by-race group has its own slope; the slope for a group is a sum of coefficients and its standard error comes from the full covariance matrix. Regional estimates re-run @eq-mincer within each of the five macro-regions.
+
+## Inference
+
+Standard errors come from the design of the survey, in the sense of @lumley2004 and @lumley2010. For each year the design object is built from the full first-visit file, with the census tract as the sampling unit, the stratum as the stratum and the first-visit weight as the weight, and the analysis sample is then taken as a subset of that design, so that the variance formula keeps the right count of sampling units per stratum. The coefficients are weighted least squares; their variance is estimated by linearisation, which asks how much the estimate would change if each census tract were dropped, and the reference distribution is a $t$ with degrees of freedom equal to the number of tracts minus the number of strata, about `r big(round(H$degf_pooled))` in the pooled design. The pooled design stacks all years and treats the same tract in different years as one cluster, which is the conservative choice for a survey that reuses its master sample.
+
+Two shortcuts that practitioners often take are reported for comparison: unweighted OLS with heteroskedasticity-robust (HC1) standard errors, which treats every worker as an independent draw, and weighted OLS with standard errors clustered by tract, which keeps the clustering but ignores the stratification. @bertrand2004 showed how badly inference goes when clustering is ignored in panel data; @solon2015 discuss when weights change the estimate and when they only change its precision; @abadie2023 explain which level to cluster at. The comparison in Section 6 shows what each layer of the design contributes here.
+
+# Results
+
+## The return to a year of schooling, 2012–2025
+
+@tbl-main reports the pooled specifications and @tbl-byyear and @fig-returns the year-by-year estimates of @eq-mincer. Pooled over the twelve survey years, a year of schooling is associated with `r pct(pool$estimate)` higher hourly earnings (standard error `r pct(pool$std.error, 2)`, `r big(H$n_total)` observations). Year by year, the coefficient starts at `r pct(yr(first_year)$estimate)` in `r first_year`, drifts down to `r pct(yr(2016)$estimate)` in 2016, climbs to `r pct(yr(2019)$estimate)` in 2019, and is lowest in the three post-pandemic years, at `r pct(yr(2022)$estimate)`, `r pct(yr(2023)$estimate)` and `r pct(yr(2024)$estimate)`, before returning to `r pct(yr(last_year)$estimate)` in `r last_year`. With standard errors of about `r pct(mean(by_year$std.error), 2)` points, most of the year-to-year movement is within sampling error; the drop from 2018–2019 to 2022–2024 is not, since the confidence intervals `r ci(yr(2019))` and `r ci(yr(2023))` do not overlap. The Brazilian number sits above the 7.8 percent that @duflo2001 finds for Indonesian wage earners in 1995 and in the upper part of the Latin American range in @psacharopoulos2018, but well below the 15 percent or more that @lam1993 and @menezesfilho2001 report for Brazil in the 1980s and 1990s, when secondary and university graduates were far scarcer.
+
+![The return to a year of schooling by survey year. Coefficient on years of schooling in the linear specification with state fixed effects, one regression per year, workers aged 25–64. Shaded bands are design-based 95 percent confidence intervals. No first-visit microdata were released for 2020 and 2021.](output/figures/fig_returns_by_year.pdf){#fig-returns width=100%}
+
+{{< include output/tables/tab_by_year.md >}}
+
+{{< include output/tables/tab_main.md >}}
+
+The other coefficients behave as the literature leads one to expect and are stable across specifications. Holding schooling, age, area and state constant, women earn `r pct(-cf("linear", "female_fWomen"), 0)` log points less per hour than men and Black and Brown workers `r pct(-cf("linear", "raceBlack/Brown"), 0)` log points less than White and Asian workers; urban workers earn `r pct(cf("linear", "urbanTRUE"), 0)` log points more than rural ones; earnings peak at `r round(-cf("linear", "age") / (2 * cf("linear", "age2")))` years of age.
+
+## Premia by completed level
+
+Column (2) of @tbl-main replaces years of schooling by the level completed, and @tbl-levels and @fig-levels follow the level premia over time. The profile is strongly convex. Relative to workers with no schooling, a completed *ensino fundamental* is worth `r num(lv("Fundamental complete"), 2)` log points, or `r pct(ret_fund)` for each of its nine years; a completed *ensino médio* adds `r num(lv("Medio complete") - lv("Fundamental complete"), 2)` log points over three more years, `r pct(ret_medio)` a year; and a completed degree adds `r num(lv("Superior complete") - lv("Medio complete"), 2)` log points over four more years, `r pct(ret_sup)` a year. Finishing a level is worth more than the years it takes. The step from an incomplete to a complete *fundamental* is `r num(sheep_fund, 2)` log points, from an incomplete to a complete *médio* `r num(sheep_medio, 2)`, and from an incomplete to a complete degree `r num(sheep_sup, 2)`, sheepskin effects of the kind documented by @hungerford1987 and far larger than those they found.
+
+![Earnings premia by completed level of education, relative to no schooling, with the same controls as the linear specification; one regression per year. Shaded bands are design-based 95 percent confidence intervals.](output/figures/fig_levels_by_year.pdf){#fig-levels width=100%}
+
+{{< include output/tables/tab_levels.md >}}
+
+Every premium fell. Relative to no schooling, a completed degree was worth `r num(lv("Superior complete", first_year), 2)` log points in `r first_year`, `r num(lv("Superior complete", 2019), 2)` in 2019 and `r num(lv("Superior complete", last_year), 2)` in `r last_year`; a completed *médio* went from `r num(lv("Medio complete", first_year), 2)` to `r num(lv("Medio complete", last_year), 2)` and a completed *fundamental* from `r num(lv("Fundamental complete", first_year), 2)` to `r num(lv("Fundamental complete", last_year), 2)`. Because the decline is proportionally similar at every level, it is unlikely to be a story about university graduates alone. Two things could be going on. The reference group of workers with no schooling shrank and aged while the real minimum wage rose through the 2010s, which lifted the bottom of the earnings distribution; @engbom2022 show that the minimum wage explains a large part of the compression of Brazilian earnings in these years. And the supply of workers at every completed level kept expanding, which in the supply-and-demand framework of @katz1992 lowers the price of each level.
+
+How can every level premium fall while the single Mincer coefficient barely moves? The linear coefficient is not a separate fact; it is a weighted average of the slopes between adjacent levels, with weights that depend on where the workers are in the schooling distribution [@yitzhaki1996; @angrist1999]. As mean schooling rose by almost two years, more of the workforce sat on the steep segment between *médio* and university, and that segment received more weight. @menezesfilho2006 described the same composition mechanism for Brazilian inequality a decade earlier. The arithmetic fits the data, but it is an interpretation; the paper does not decompose the change formally.
+
+## Sex and race
+
+Column (3) of @tbl-main lets the slope differ by sex and race, and @fig-het traces the four resulting gradients year by year. Pooled over all years, a year of schooling is worth `r pct(hp("Men, White/Asian")$estimate)` for White and Asian men, `r pct(hp("Women, White/Asian")$estimate)` for White and Asian women, `r pct(hp("Men, Black/Brown")$estimate)` for Black and Brown men and `r pct(hp("Women, Black/Brown")$estimate)` for Black and Brown women, each with a standard error below `r pct(max(hetp$std.error), 2)` points. Two conditional gaps follow. The gender gap narrows with schooling: at nine years women earn `r pct(-gap_women(9), 0)` log points less than men with the same characteristics, at sixteen years `r pct(-gap_women(16), 0)` log points less. The racial gap widens with schooling: it is `r pct(-gap_race(9), 0)` log points at nine years, `r pct(-gap_race(12), 0)` at twelve and `r pct(-gap_race(16), 0)` at sixteen. The ordering of the four gradients is the same in every year, and all four dip after the pandemic.
+
+![Return to a year of schooling by sex and race. Group-specific schooling coefficients from the interaction specification, one regression per year, with design-based 95 percent confidence intervals.](output/figures/fig_heterogeneity.pdf){#fig-het width=100%}
+
+These are differences among people who work. Who works differs by sex and race, and earnings are observed only for them, so a steeper gradient for women can reflect the stronger selection of less-educated women out of paid work as much as a higher pay-off to schooling, the problem analysed by @heckman1979. The gradients are reported because they are precisely measured facts about who earns what, not as causal returns.
+
+## Regions
+
+@tbl-regions and @fig-regions re-estimate the pooled equation within each macro-region. The gradient is steepest in the Nordeste, `r pct(rg("Nordeste")$estimate)`, then the Sudeste, `r pct(rg("Sudeste")$estimate)`, the Norte, `r pct(rg("Norte")$estimate)`, the Centro-Oeste, `r pct(rg("Centro-Oeste")$estimate)`, and the Sul, `r pct(rg("Sul")$estimate)`. The ranking follows the scarcity of educated workers across regions, and it matches what Duflo found across Indonesian districts, where returns were higher where initial schooling was lower (her Table 6).
+
+![Return to a year of schooling by macro-region, pooled 2012–2025, linear specification with state and year fixed effects estimated separately by region, with design-based 95 percent confidence intervals.](output/figures/fig_regions.pdf){#fig-regions width=100%}
+
+{{< include output/tables/tab_regions.md >}}
+
+# Robustness
+
+@tbl-robust re-estimates the pooled coefficient under six sample and measurement variants and the two inference shortcuts. The point estimate is `r pct(rb(1)$estimate, 2)` at baseline; `r pct(rb(2)$estimate, 2)` with effective instead of habitual earnings; `r pct(rb(3)$estimate, 2)` for formal workers only; `r pct(rb(4)$estimate, 2)` for wage employees only, the sample closest to Duflo's; `r pct(rb(5)$estimate, 2)` when workers aged 18–24 are added; and `r pct(rb(6)$estimate, 2)` when the 0.5 percent tails of log earnings are dropped. The range, `r pct(min(rob$estimate[1:6]), 1)` to `r pct(max(rob$estimate[1:6]), 1)`, is narrow next to the differences across groups and levels, and each change goes the way one would expect: better-measured and formal earnings carry a slightly steeper gradient, and young workers, whose earnings are still rising, a flatter one.
+
+{{< include output/tables/tab_robustness.md >}}
+
+The inference comparison is the more instructive part of the table. Unweighted OLS with HC1 standard errors moves the point estimate to `r pct(rb(7)$estimate, 2)` and reports a standard error of `r num(rb(7)$std.error, 5)`, `r sprintf("%.1f", rb(1)$std.error / rb(7)$std.error)` times smaller than the design-based `r num(rb(1)$std.error, 5)`. The gap is the clustering of households within census tracts, which the robust standard error ignores. Weighted OLS with standard errors clustered by tract recovers the design-based point estimate exactly and a standard error of `r num(rb(8)$std.error, 5)`, slightly above the design-based one because it forgoes the precision that stratification adds. For a coefficient this precisely estimated the practical consequence is small, but the same factor of three applies to every comparison across groups and years in the paper.
+
+# What the numbers cannot tell us
+
+The coefficients in this paper measure how much more educated workers earn. They do not measure how much more a given person would earn after one more year of school, for the reasons set out by @griliches1977 and surveyed by @card1999: people who stay in school longer tend to have more ability and better-off families, both of which raise earnings on their own, and in Brazil @lam1993 showed that family background accounts for a sizeable share of the measured return. Earnings are also observed only for people who work, and who works is not random [@heckman1979]. Duflo's Indonesian estimates were designed to escape both problems, and even they turn out to be weakly identified under reanalysis. The design-based standard errors, however carefully computed, say nothing about these biases; they only make the descriptive estimate honest about its sampling precision.
+
+Measurement matters for the magnitudes. Hourly earnings combine reported monthly earnings with reported weekly hours, often given by another household member, so errors in hours enter the dependent variable directly; trimming and the effective-earnings variant bound the influence of outliers, not of systematic misreporting. Years of schooling say nothing about school quality, which @behrman1983 showed long ago matters as much as quantity in Brazil and which varies enormously across states and between public and private schools. The self-employed and employers are in the sample, and their earnings mix the return to labour with the return to capital; the wage-employee variant shows that this choice moves the pooled coefficient by little.
+
+Two features of the data limit comparisons over time. Nothing can be said about 2020 and 2021. For 2022, the current microdata file gives mean labour income 3.3 percent above the values IBGE published for that year, while every other year matches within 0.01 percent; I use the microdata as released and record the discrepancy. All files are the 2025 revision of the series, re-weighted to post-Census population projections, and the published aggregates may be revised again.
+
+Finally, the PNAD Contínua records where a worker lives, not where she was born or went to school. Interstate migration is selective, so the regional gradients describe where educated workers earn, not where they were educated.
+
+# Conclusion
+
+Among occupied Brazilians aged 25–64, a year of schooling is associated with about `r pct(pool$estimate, 0)` higher hourly earnings in every survey year between `r first_year` and `r last_year`. The number is stable, but the relationship behind it is not. A completed degree is worth `r num(lv("Superior complete"), 2)` log points over no schooling, the step from secondary to tertiary education carries an implied `r pct(ret_sup, 0)` a year, and every level premium fell over the period as the workforce moved up that convex profile. The gradient is steeper for women, flatter for Black and Brown workers and steepest in the Nordeste.
+
+The paper also shows what careful descriptive work requires. Reproducing IBGE's published aggregates from the microdata caught the exact definitions of the official series and exposed a discrepancy in one year; stating the inference choices showed that the common shortcut of robust standard errors on unweighted data overstates precision by a factor of three. Those are the lessons of the reanalysis of Duflo's paper, applied before any causal claim is attempted.
+
+The causal question remains open for Brazil. Answering it in Duflo's spirit requires a program with a documented allocation rule and data on where people were born, which points to the 1998 FUNDEF school-finance reform and the 2010 or 2022 Censuses rather than to the PNAD Contínua. The estimates here are the benchmark against which such a design should be judged.
+
+# References {.unnumbered}
+
+::: {#refs}
+:::
+
+# Appendix {.unnumbered}
+
+{{< include output/tables/tab_build_counts.md >}}
+
+{{< include output/tables/tab_checks.md >}}
